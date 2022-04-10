@@ -1,0 +1,4 @@
+[flake8]
+exclude = .venv
+import-order-style = smarkets
+application-import-names = pt750
