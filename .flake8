@@ -2,3 +2,4 @@
 exclude = .venv
 import-order-style = smarkets
 application-import-names = pt750
+max-line-length = 88

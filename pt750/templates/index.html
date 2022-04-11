@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"
+    />
+
+    <title>Label Printer</title>
+  </head>
+  <body onload="onload()">
+    <div class="container">
+      <header
+        class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom"
+      >
+        <a
+          href="/"
+          class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none"
+        >
+          <svg class="bi me-2" width="40" height="32">
+            <use xlink:href="#bootstrap" />
+          </svg>
+          <span class="fs-4">Label Printer</span>
+        </a>
+
+        <ul class="nav nav-pills">
+          <li class="nav-item">
+            <a
+              id="text_nav"
+              href="javascript:set_label('text')"
+              class="nav-link"
+              >Text</a
+            >
+          </li>
+          <li class="nav-item">
+            <a id="qr_nav" href="javascript:set_label('qr')" class="nav-link"
+              >QR</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              id="flag_nav"
+              href="javascript:set_label('flag')"
+              class="nav-link"
+              >Flag</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              id="wrap_nav"
+              href="javascript:set_label('wrap')"
+              class="nav-link"
+              >Wrap</a
+            >
+          </li>
+        </ul>
+      </header>
+
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="accordion" id="accordian">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingOne">
+                <button
+                  type="button"
+                  class="accordion-button collapsed"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseOne"
+                >
+                  <span class="me-3">
+                    <i
+                      class="bi-fonts"
+                      style="font-size: 2rem; color: cornflowerblue"
+                    ></i></span
+                  >Font
+                </button>
+              </h2>
+              <div
+                id="collapseOne"
+                class="accordion-collapse collapse show"
+                data-bs-parent="#accordion"
+              >
+                <div class="card-body">
+                  <form id="font-form">
+                    <div class="mb-3">
+                      <label class="form-label" for="fontname">Font</label>
+                      <select
+                        class="form-select"
+                        id="fontname"
+                        onclick="update_preview()"
+                      >
+                        <option value="mono" selected>Mono</option>
+                        <option value="serif">Serif</option>
+                        <option value="sans">Sans-Serif</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label" for="size">Size</label>
+                      <select
+                        class="form-select"
+                        id="size"
+                        onclick="update_preview()"
+                      >
+                        <option value="large" selected>Large</option>
+                        <option value="medium">Medium</option>
+                        <option value="small">Small</option>
+                      </select>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="font-accordian">
+                <button
+                  type="button"
+                  class="accordion-button collapsed"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseTwo"
+                >
+                  <span class="me-3">
+                    <i
+                      class="bi-printer"
+                      style="font-size: 2rem; color: cornflowerblue"
+                    ></i></span
+                  >Printer
+                </button>
+              </h2>
+              <div
+                id="collapseTwo"
+                class="accordion-collapse collapse show"
+                data-bs-parent="#accordion"
+              >
+                <div class="card-body">
+                  <form id="printer-form">
+                    <div class="mb-3">
+                      <label class="form-label" for="printer">Printer</label>
+                      <select class="form-select" id="printer"></select>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle -->
+        <div class="col-lg-4">
+          <form id="text-form">
+            <!-- Tapes -->
+            <div class="mb-3">
+              <label class="form-label" for="tape">Tape</label>
+              <select
+                class="form-select"
+                id="tape"
+                onclick="update_preview()"
+              ></select>
+            </div>
+
+            <div id="lines_div" class="mb-3">
+              <label class="form-label" for="lines">Text</label>
+              <textarea
+                rows="4"
+                cols="40"
+                class="form-control"
+                onchange="update_preview()"
+                id="lines"
+              >
+example label</textarea
+              >
+              <div class="btn-group" role="group">
+                <input
+                  type="radio"
+                  class="btn-check"
+                  name="align"
+                  id="left"
+                  value="left"
+                  autocomplete="off"
+                  onclick="update_preview()"
+                  checked
+                />
+                <label class="btn btn-secondary" for="left">
+                  <span class="btn-label"> <i class="bi-text-left"></i> </span
+                  >Left
+                </label>
+                <input
+                  type="radio"
+                  class="btn-check"
+                  name="align"
+                  id="center"
+                  value="center"
+                  onclick="update_preview()"
+                  autocomplete="off"
+                />
+                <label class="btn btn-secondary" for="center">
+                  <span class="btn-label"> <i class="bi-text-center"></i> </span
+                  >Center
+                </label>
+
+                <input
+                  type="radio"
+                  class="btn-check"
+                  name="align"
+                  id="right"
+                  value="right"
+                  onclick="update_preview()"
+                  autocomplete="off"
+                />
+                <label class="btn btn-secondary" for="right">
+                  <span class="btn-label"> <i class="bi-text-right"></i> </span
+                  >Right
+                </label>
+              </div>
+            </div>
+
+            <div id="qrtext_div" class="mb-3">
+              <label class="form-label" for="qrtext">QR Data</label>
+              <input
+                class="form-control"
+                id="qrtext"
+                onchange="update_preview()"
+                placeholder="QR Data"
+              />
+            </div>
+
+            <div id="label_div" class="mb-3">
+              <label class="form-label" for="label">Text</label>
+              <input
+                class="form-control"
+                id="label"
+                onchange="update_preview()"
+                placeholder="label"
+              />
+            </div>
+          </form>
+        </div>
+
+        <!-- Right -->
+        <div class="col-lg-4">
+          <div class="accordion mb-3" id="accordianRight">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="rightHeadingOne">
+                <button
+                  type="button"
+                  class="accordion-button collapsed"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseRightOne"
+                >
+                  <span class="me-3">
+                    <i
+                      class="bi-camera"
+                      style="font-size: 2rem; color: cornflowerblue"
+                    ></i></span
+                  >Preview
+                </button>
+              </h2>
+              <div
+                id="collapseRightOne"
+                class="accordion-collapse collapse show"
+                data-bs-parent="#accordionRight"
+              >
+                <div class="card-body">
+                  <form id="font-form">
+                    <div id="preview_div" class="mb-3">
+                      <div>
+                        <label
+                          id="preview_label"
+                          class="form-label"
+                          for="preview"
+                        ></label>
+                      </div>
+                      <img border="1px" id="preview" />
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="mb-3"> -->
+          <!--   <img id="preview"/> -->
+          <!-- </div> -->
+          <div class="d-grid gap-2">
+            <button
+              class="btn btn-primary"
+              onclick="update_preview()"
+              type="button"
+            >
+              <span class="btn-label me-3"><i class="bi-camera"></i></span>
+              Preview
+            </button>
+            <button class="btn btn-primary" type="button" onclick="print()">
+              <span class="btn-label me-3"><i class="bi-printer"></i></span>
+              Print
+            </button>
+          </div>
+
+          <div id="warning_div" class="alert alert-success mt-4">Ok</div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/labels.js"></script>
+  </body>
+</html>
