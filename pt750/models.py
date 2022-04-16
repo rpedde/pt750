@@ -1,12 +1,97 @@
 from enum import Enum
+from typing import Literal, Union
+
+from pydantic import BaseModel, BaseSettings, validator
+
+
+class ParameterError(Exception):
+    pass
+
+
+class Tape(BaseModel):
+    size: str
+    printable_height: int
+    offset: int
+
+
+class Tapes(Enum):
+    size_24mm = "24mm"
+    size_12mm = "12mm"
+    size_9mm = "9mm"
+    size_6mm = "6mm"
+
+
+tapes = {
+    "24mm": Tape(size="24mm", printable_height=128, offset=0),
+    "12mm": Tape(size="12mm", printable_height=64, offset=32),
+    "9mm": Tape(size="9mm", printable_height=48, offset=40),
+    "6mm": Tape(size="6mm", printable_height=32, offset=48),
+}
 
 
 class HAlignment(Enum):
-    left = 'left'
-    right = 'right'
-    center = 'center'
+    left = "left"
+    right = "right"
+    center = "center"
 
 
 class VAlignment(Enum):
-    center = 'center'
-    even = 'even'
+    center = "center"
+    even = "even"
+
+
+class BaseLabel(BaseModel):
+    printer: str
+    tape: Tapes
+    fontname: str = "mono"
+
+
+# request models
+class TextLabelRequest(BaseLabel):
+    label_type: Literal["text"]
+
+    align: HAlignment = HAlignment.left
+    size: str = "large"
+    lines: list[str]
+
+
+class QRLabelRequest(BaseLabel):
+    label_type: Literal["qr"]
+
+    align: HAlignment = HAlignment.left
+    padding: int = 10
+    size: str = "large"
+    qrtext: str
+    lines: list[str] = []
+
+
+class WrapLabelRequest(BaseLabel):
+    label_type: Literal["wrap"]
+
+    length: int = 128
+    min_count: int = 7
+    label: str
+
+
+class FlagLabelRequest(BaseLabel):
+    label_type: Literal["flag"]
+
+    padding: int = 96
+    size: str = "large"
+    label: str
+
+
+class LabelRequest(BaseModel):
+    label: Union[TextLabelRequest, QRLabelRequest, WrapLabelRequest, FlagLabelRequest]
+    count: int = 1
+
+
+class Settings(BaseSettings):
+    printers: Union[str, list[str]] = "file:///dev/null"
+
+    @validator("printers")
+    def comma_separated(cls, v):
+        return list(map(str.strip, v.split(",")))
+
+    class Config:
+        env_prefix = "l_"

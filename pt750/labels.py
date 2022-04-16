@@ -19,39 +19,43 @@ class Label:
 
 
 class TextLabel(Label):
-    def __init__(self,
-                 height: int,
-                 fontname: str,
-                 lines: list[str],
-                 align: models.HAlignment = models.HAlignment.left,
-                 size: str = 'large'):
+    def __init__(
+        self,
+        height: int,
+        fontname: str,
+        lines: list[str],
+        align: models.HAlignment = models.HAlignment.left,
+        size: str = "large",
+    ):
         self.height = height
         self.fontname = fontname
         self.lines = lines
         self.align = align
         self.size = size
 
+        if not all(x for x in lines):
+            raise models.ParameterError("Empty lines not allowed")
+
         self.generate()
 
     def generate(self):
         img = draw.horiz_text_block(
-            self.height,
-            self.fontname,
-            self.size,
-            self.lines,
-            alignment=self.align)
+            self.height, self.fontname, self.size, self.lines, alignment=self.align
+        )
         self.img = img
 
 
 class QRLabel(Label):
-    def __init__(self,
-                 height: int,
-                 fontname: str,
-                 qrtext: str,
-                 size: str = 'large',
-                 padding: int = 10,
-                 align: models.HAlignment = models.HAlignment.left,
-                 lines: Optional[list[str]] = None):
+    def __init__(
+        self,
+        height: int,
+        fontname: str,
+        qrtext: str,
+        size: str = "large",
+        padding: int = 10,
+        align: models.HAlignment = models.HAlignment.left,
+        lines: Optional[list[str]] = None,
+    ):
         self.height = height
         self.fontname = fontname
         self.qrtext = qrtext
@@ -62,18 +66,19 @@ class QRLabel(Label):
         if self.lines is None:
             self.lines = []
 
+        if lines and not all(x for x in lines):
+            raise models.ParameterError("Empty lines not allowed")
+
         self.generate()
 
     def generate(self):
         qr_img = draw.qr_code(self.height, self.qrtext)
-        if self.lines:
-            text_img = draw.horiz_text_block(self.height,
-                                             self.fontname,
-                                             self.size,
-                                             self.lines,
-                                             self.align)
+        if self.lines and all(x for x in self.lines):
+            text_img = draw.horiz_text_block(
+                self.height, self.fontname, self.size, self.lines, self.align
+            )
             width = qr_img.width + text_img.width + self.padding
-            img = Image.new(mode='1', size=(width, self.height), color=1)
+            img = Image.new(mode="1", size=(width, self.height), color=1)
             img.paste(qr_img)
             img.paste(text_img, (qr_img.width + self.padding, 0))
         else:
@@ -83,46 +88,56 @@ class QRLabel(Label):
 
 
 class WrapLabel(Label):
-    def __init__(self,
-                 height: int,
-                 fontname: str,
-                 label: str,
-                 length: int = 128,
-                 min_count: int = 7):
+    def __init__(
+        self,
+        height: int,
+        fontname: str,
+        label: str,
+        length: int = 128,
+        min_count: int = 7,
+    ):
         self.height = height
         self.fontname = fontname
         self.label = label
         self.length = length
         self.min_count = min_count
+
+        if not label:
+            raise models.ParameterError("label is required")
+
         self.generate()
 
     def generate(self):
-        img = draw.vertical_text_block(self.height,
-                                       self.length,
-                                       self.fontname,
-                                       self.label,
-                                       min_count=self.min_count)
+        img = draw.vertical_text_block(
+            self.height,
+            self.length,
+            self.fontname,
+            self.label,
+            min_count=self.min_count,
+        )
         self.img = img
 
 
 class FlagLabel(Label):
-    def __init__(self, height, fontname, label, size='large', padding=96):
+    def __init__(self, height, fontname, label, size="large", padding=96):
         self.height = height
         self.fontname = fontname
         self.label = label
         self.size = size
         self.padding = padding
 
+        if not label:
+            raise models.ParameterError("label is required")
+
         self.generate()
 
     def generate(self):
-        text_img = draw.horiz_text_block(self.height,
-                                         self.fontname,
-                                         self.size,
-                                         lines=[self.label])
+        text_img = draw.horiz_text_block(
+            self.height, self.fontname, self.size, lines=[self.label]
+        )
 
         width = (text_img.width * 2) + self.padding
-        img = Image.new(mode='1', size=(width, self.height), color=1)
+        img = Image.new(mode="1", size=(width, self.height), color=1)
         img.paste(text_img)
         img.paste(text_img, (text_img.width + self.padding, 0))
         img_draw = ImageDraw.Draw(img)

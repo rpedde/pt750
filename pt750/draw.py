@@ -6,58 +6,49 @@ from PIL import Image, ImageDraw, ImageFont
 
 from pt750.models import HAlignment
 
-
 _font_cache: dict[str, str] = {}
 
 
-font_sizes = {
-    'large': 1.0,
-    'medium': 0.75,
-    'small': 0.5
-}
+font_sizes = {"large": 1.0, "medium": 0.75, "small": 0.5}
 
 
 font_map = {
-    'mono': 'PragmataPro_Mono_R_0828.ttf',
-    'serif': 'DejaVuSerif',
-    'sans-serif': 'DejaVuSans',
-    'sans': 'DejaVuSans'
+    "mono": "PragmataPro_Mono_R_0828.ttf",
+    "serif": "DejaVuSerif",
+    "sans-serif": "DejaVuSans",
+    "sans": "DejaVuSans",
 }
 
 
 def path_for(fontname: str):
-    if fontname.startswith('/'):
+    if fontname.startswith("/"):
         return fontname
 
     fontname = font_map.get(fontname, fontname)
 
     if not _font_cache:
-        path_lists = subprocess.check_output(
-            ['fc-list', '-f', '%{file}\n']).decode()
+        path_lists = subprocess.check_output(["fc-list", "-f", "%{file}\n"]).decode()
 
-        for line in path_lists.split('\n'):
+        for line in path_lists.split("\n"):
             line = line.strip()
             if line:
-                font = line.split('/')[-1]
-                if font.endswith('.ttf'):
+                font = line.split("/")[-1]
+                if font.endswith(".ttf"):
                     _font_cache[font] = line
 
-    path = _font_cache.get(fontname, _font_cache.get(f'{fontname}.ttf', None))
+    path = _font_cache.get(fontname, _font_cache.get(f"{fontname}.ttf", None))
     if not path:
-        raise RuntimeError(f'Bad font: {fontname}')
+        raise RuntimeError(f"Bad font: {fontname}")
 
     return path
 
 
-def find_fit(fontname: str,
-             size: float,
-             text: str,
-             constrain_height: bool = True):
+def find_fit(fontname: str, size: float, text: str, constrain_height: bool = True):
     fontsize = 1
 
     fontname = path_for(fontname)
     if not fontname:
-        raise RuntimeError(f'Cannot find font {fontname}')
+        raise RuntimeError(f"Cannot find font {fontname}")
 
     font = ImageFont.truetype(fontname, fontsize)
 
@@ -70,26 +61,20 @@ def find_fit(fontname: str,
     return fontsize - 1
 
 
-def qr_code(height: int,
-            text: str):
-    img = Image.new('1', size=(height, height), color=1)
+def qr_code(height: int, text: str):
+    img = Image.new("1", size=(height, height), color=1)
 
-    code = treepoem.generate_barcode(barcode_type='qrcode',
-                                     data=text)
+    code = treepoem.generate_barcode(barcode_type="qrcode", data=text)
 
     code_img = code.resize((height, height), resample=Image.NEAREST)
     img.paste(code_img)
     return img
 
 
-def vertical_text_block(width: int,
-                        height: int,
-                        fontname: str,
-                        text: str,
-                        min_count=1):
+def vertical_text_block(width: int, height: int, fontname: str, text: str, min_count=1):
     fontpath = path_for(fontname)
     if not fontpath:
-        raise RuntimeError('Cannot find font')
+        raise RuntimeError("Cannot find font")
 
     # width here is "width of text", i.e. height
 
@@ -100,7 +85,7 @@ def vertical_text_block(width: int,
     fs = min(fs_width, fs_height)
 
     font = ImageFont.truetype(fontpath, fs)
-    img = Image.new('1', size=(width, height), color=1)
+    img = Image.new("1", size=(width, height), color=1)
     draw = ImageDraw.Draw(img)
 
     line_height = font.getsize(text)[1]
@@ -114,15 +99,17 @@ def vertical_text_block(width: int,
     return img
 
 
-def horiz_text_block(height: int,
-                     fontname: str,
-                     fontsize: str,
-                     lines: list[str],
-                     alignment: HAlignment = HAlignment.left):
+def horiz_text_block(
+    height: int,
+    fontname: str,
+    fontsize: str,
+    lines: list[str],
+    alignment: HAlignment = HAlignment.left,
+):
 
     fontpath = path_for(fontname)
     if not fontpath:
-        raise RuntimeError(f'Cannot find font {fontname}')
+        raise RuntimeError(f"Cannot find font {fontname}")
 
     rows = len(lines)
     height_per_row = height / rows
@@ -130,9 +117,9 @@ def horiz_text_block(height: int,
     font_height = height_per_row * font_sizes[fontsize]
 
     # now, choose a font!
-    fs = find_fit(fontpath, font_height, ''.join(lines))
+    fs = find_fit(fontpath, font_height, "".join(lines))
 
-    print(f'chosen font size: {fs}')
+    print(f"chosen font size: {fs}")
 
     line_ofs = (height_per_row - font_height) // 2
     font = ImageFont.truetype(fontpath, fs)
@@ -142,7 +129,7 @@ def horiz_text_block(height: int,
     for line in lines:
         width = max(width, font.getsize(line)[0])
 
-    img = Image.new(mode='1', size=(width, height), color=1)
+    img = Image.new(mode="1", size=(width, height), color=1)
 
     draw = ImageDraw.Draw(img)
 
@@ -156,7 +143,6 @@ def horiz_text_block(height: int,
         else:
             xofs = width - line_width
 
-        draw.text((xofs, (idx * height_per_row) + line_ofs),
-                  line, font=font)
+        draw.text((xofs, (idx * height_per_row) + line_ofs), line, font=font)
 
     return img

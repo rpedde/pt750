@@ -9,6 +9,10 @@ license = "GPL3"
 python = "^3.9"
 Pillow = "^9.1.0"
 treepoem = "^3.14.0"
+fastapi = "^0.75.1"
+Jinja2 = "^3.1.1"
+uvicorn = "^0.17.6"
+PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
@@ -24,6 +28,9 @@ makelabel = "pt750.main:main"
 module = "PIL"
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "uvicorn"
+ignore_missing_imports = true
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
