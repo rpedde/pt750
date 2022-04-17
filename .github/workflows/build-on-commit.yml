@@ -1,0 +1,22 @@
+name: build and push on commit
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build and Publish
+        uses: elgohr/Publish-Docker-Github-Action@757f58a82c2851acf641d0410b80e98680811614
+        with:
+          name: rpedde/pt750/pt750
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          tags: "latest"
