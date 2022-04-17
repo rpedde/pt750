@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pt750"
-version = "0.1.0"
+version = "0.2.0"
 description = "label printing tools for brother PT-P750W label maker"
 authors = ["rpedde <ron@pedde.com>"]
 license = "GPL3"
