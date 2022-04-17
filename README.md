@@ -18,9 +18,29 @@ This also includes a web interface for printing labels, as well as
 a docker container set up for label printing.
 
 The only necessary environment variable to set on the docker container
-is L_PRINTERS, a comma-separated list of printer uris, like:
+is L_PRINTERS, a comma-separated list of key=value pairs that map from
+friendly name to printer uri:
 
-`tcp://some.printer:9100,tcp://someother.printer:9100`
+`L_PRINTERS=office=tcp://some.printer:9100,kitchen=tcp://someother.printer:9100`
+
+which will set up two printers, "office" and "kitchen", pointed to
+two different ip printers.
+
+Additionally, the default fonts (mono, sans, and serif) are set
+to DejaVuSansMono, DejaVuSans and DejaVuSerif. While these are
+perfectly functional fonts, there are fonts that scale better
+to lower resolutions.
+
+You can override or add fonts by putting the ttf fonts in a
+directory and adding that directory to the font path (a
+comma separated list of directories):
+
+`L_FONT_DIRS=/fonts,/otherfonts`
+
+and then mapping friendly names to individual font files,
+as such:
+
+`L_FONT_MAP=pragmata=PragmataPro_Mono_R_0828.ttf,consolas=consola.ttf`
 
 ## Changes
 

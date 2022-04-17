@@ -133,8 +133,6 @@ def horiz_text_block(
     # now, choose a font!
     fs = find_fit(fontpath, font_height, "".join(lines))
 
-    print(f"chosen font size: {fs}")
-
     line_ofs = (height_per_row - font_height) // 2
     font = ImageFont.truetype(fontpath, fs)
 
