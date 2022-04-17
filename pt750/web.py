@@ -67,7 +67,7 @@ async def config():
 
     response = {
         "tapes": list(models.tapes.keys()),
-        "printers": list(settings.printers),
+        "printers": list(settings.printers.keys()),
         "fonts": list(draw.font_map.keys()),
     }
 
@@ -86,8 +86,10 @@ async def print(label_request: models.LabelRequest):
     out_img = Image.new(mode="1", size=(final_width, 128), color=1)
     out_img.paste(img, (0, final_ofs))
 
-    printer = transports.PT750W(label_request.label.printer)
-    printer.print(out_img)
+    printer_uri = settings.printers[label_request.label.printer]  # type: ignore
+
+    driver = transports.PT750W(printer_uri)
+    driver.print(out_img)
 
 
 @app.put("/preview")
