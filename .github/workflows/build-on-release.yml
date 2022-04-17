@@ -1,8 +1,12 @@
-name: build and push container
+name: build and push on release and tag
 
 on:
+  push:
+    tags:
+      - "v*.*.*"
+
   release:
-    types: [publishes]
+    types: [published]
 
 jobs:
   docker:
