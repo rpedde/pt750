@@ -1,9 +1,8 @@
 name: build and push container
 
 on:
-  push:
-    branches:
-      - "master"
+  release:
+    types: [publishes]
 
 jobs:
   docker:
@@ -20,4 +19,3 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
           tag_semver: true
-          tags: "latest"
