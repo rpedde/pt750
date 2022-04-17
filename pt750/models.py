@@ -88,10 +88,24 @@ class LabelRequest(BaseModel):
 
 class Settings(BaseSettings):
     printers: Union[str, list[str]] = "file:///dev/null"
+    font_dirs: Union[None, str, list[str]] = None
+    font_map: Union[str, dict[str, str]] = ""
 
-    @validator("printers")
+    @validator("font_dirs", "printers", allow_reuse=True)
     def comma_separated(cls, v):
+        if v is None:
+            return None
+
         return list(map(str.strip, v.split(",")))
+
+    @validator("font_map")
+    def kvpairs(cls, v):
+        if v:
+            return dict([x.split("=") for x in v.split(",")])
+        return {}
 
     class Config:
         env_prefix = "l_"
+
+
+settings = Settings()

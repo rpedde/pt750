@@ -14,4 +14,14 @@ types, including:
 - wifi: qr code for wifi setup (ssid/password)
 - flag: suitable for a cable flag
 
-At some point, I'd like to do a web interface.
+This also includes a web interface for printing labels, as well as
+a docker container set up for label printing.
+
+The only necessary environment variable to set on the docker container
+is L_PRINTERS, a comma-separated list of printer uris, like:
+
+`tcp://some.printer:9100,tcp://someother.printer:9100`
+
+## Changes
+
+0.1.0: Initial release

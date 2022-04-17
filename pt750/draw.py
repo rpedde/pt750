@@ -1,23 +1,26 @@
+import os
 import subprocess
 from operator import itemgetter
+from typing import Optional
 
 import treepoem
 from PIL import Image, ImageDraw, ImageFont
 
-from pt750.models import HAlignment
+from pt750.models import HAlignment, settings
+
 
 _font_cache: dict[str, str] = {}
-
 
 font_sizes = {"large": 1.0, "medium": 0.75, "small": 0.5}
 
 
 font_map = {
-    "mono": "PragmataPro_Mono_R_0828.ttf",
+    "mono": "DejaVuSansMono",
     "serif": "DejaVuSerif",
-    "sans-serif": "DejaVuSans",
     "sans": "DejaVuSans",
 }
+
+font_map.update(settings.font_map)  # type: ignore
 
 
 def path_for(fontname: str):
@@ -36,7 +39,18 @@ def path_for(fontname: str):
                 if font.endswith(".ttf"):
                     _font_cache[font] = line
 
-    path = _font_cache.get(fontname, _font_cache.get(f"{fontname}.ttf", None))
+        # additionally, let's add any .ttf files found in
+        # settings.font_dir
+        if settings.font_dirs:
+            for path in settings.font_dirs:
+                for font in os.listdir(path):
+                    if font.endswith(".ttf"):
+                        _font_cache[font] = os.path.join(path, font)
+
+    path: Optional[str] = _font_cache.get(fontname)
+    if path is None:
+        path = _font_cache.get(f"{fontname}.ttf")
+
     if not path:
         raise RuntimeError(f"Bad font: {fontname}")
 
