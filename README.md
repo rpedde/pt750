@@ -24,4 +24,6 @@ is L_PRINTERS, a comma-separated list of printer uris, like:
 
 ## Changes
 
+0.2.0: Add web interface
+
 0.1.0: Initial release
