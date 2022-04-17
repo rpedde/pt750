@@ -6,13 +6,6 @@ from PIL import Image
 
 from pt750 import labels, models, transports
 
-tapes = {
-    "24mm": {"printable_height": 128, "offset": 0},
-    "12mm": {"printable_height": 64, "offset": 32},
-    "9mm": {"printable_height": 48, "offset": 40},
-    "6mm": {"printable_height": 32, "offset": 48},
-}
-
 
 def get_parser():
     parser = argparse.ArgumentParser(description="make a label")
@@ -59,8 +52,8 @@ def get_parser():
 
 def main():
     args = get_parser().parse_args()
-    height = tapes[args.tape]["printable_height"]
-    final_ofs = tapes[args.tape]["offset"]
+    height = models.tapes[args.tape]["printable_height"]
+    final_ofs = models.tapes[args.tape]["offset"]
 
     img = None
 

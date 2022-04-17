@@ -69,6 +69,12 @@ function update_config() {
         for(index = 0; index < printers.length; index++) {
             $('#printer').append('<option value="' + printers[index] + '">' + printers[index] + '</option>')
         }
+
+        fonts = data["fonts"]
+        for(index = 0; index < fonts.length; index++) {
+            opt = '<option value="' + fonts[index] + '">' + fonts[index] + '</option>'
+            $('#fontname').append(opt)
+        }
     }).fail(function(jqXHR) {
         $('#warning_div').removeClass('alert-success')
         $('#warning_div').addClass('alert-danger')

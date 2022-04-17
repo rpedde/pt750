@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from PIL import Image
 
-from pt750 import labels, models, transports
+from pt750 import draw, labels, models, transports
 
 app = FastAPI()
 static_dir = os.path.join(os.path.dirname(__file__), "static")
@@ -65,7 +65,11 @@ async def index(request: Request):
 async def config():
     print(settings)
 
-    response = {"tapes": list(models.tapes.keys()), "printers": list(settings.printers)}
+    response = {
+        "tapes": list(models.tapes.keys()),
+        "printers": list(settings.printers),
+        "fonts": list(draw.font_map.keys()),
+    }
 
     return response
 
