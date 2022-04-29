@@ -20,6 +20,8 @@ flake8 = "^4.0.1"
 flake8-import-order = "^0.18.1"
 pytest = "^7.1.2"
 mypy = "^0.950"
+jsf = "^0.3.2"
+requests = "^2.27.1"
 
 [tool.poetry.scripts]
 makelabel = "pt750.main:main"
@@ -30,6 +32,10 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = "uvicorn"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "jsf"
 ignore_missing_imports = true
 
 [build-system]

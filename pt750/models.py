@@ -50,7 +50,7 @@ class BaseLabel(BaseModel):
 class TextLabelRequest(BaseLabel):
     label_type: Literal["text"]
 
-    align: HAlignment = HAlignment.left
+    align: HAlignment
     size: str = "large"
     lines: list[str]
 
@@ -58,7 +58,7 @@ class TextLabelRequest(BaseLabel):
 class QRLabelRequest(BaseLabel):
     label_type: Literal["qr"]
 
-    align: HAlignment = HAlignment.left
+    align: HAlignment
     padding: int = 10
     size: str = "large"
     qrtext: str

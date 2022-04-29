@@ -35,6 +35,9 @@ def _image_for_request(request: models.LabelRequest):
     height = models.tapes[tape].printable_height
 
     if label_type == "text":
+        assert isinstance(request.label, models.TextLabelRequest)
+        if not request.label.lines:
+            raise models.ParameterError("must supply some lines to print")
         img = labels.TextLabel(height=height, **label_info).image
     elif label_type == "qr":
         img = labels.QRLabel(height=height, **label_info).image

@@ -1,0 +1,42 @@
+name: flake8 and pytests
+
+on:
+  push:
+    branches-ignore:
+      - "master"
+
+jobs:
+  unit-test:
+    name: unit-test code base
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: install apt-packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ghostscript
+
+      - name: install poetry
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry pre-commit
+
+      - name: install deps
+        run: |
+          poetry install -vv
+
+      - name: run pre-commit
+        run: |
+          pre-commit run --all-files
+
+      - name: run tests
+        run: |
+          poetry run pytest -vvv
