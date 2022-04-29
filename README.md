@@ -44,6 +44,8 @@ as such:
 
 ## Changes
 
+0.2.1: Fix qr code label types in docker container
+
 0.2.0: Add web interface
 
 0.1.0: Initial release
