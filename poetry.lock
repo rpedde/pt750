@@ -190,7 +190,7 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "jsf"
-version = "0.3.2"
+version = "0.4.0"
 description = "Creates fake JSON files from a JSON schema"
 category = "dev"
 optional = false
@@ -564,7 +564,7 @@ standard = ["websockets (>=10.0)", "httptools (>=0.4.0)", "watchfiles (>=0.13)",
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "0112b13f78586e2220f20f61909490baff2ccb2d7c7fd2e6d532e1aecb51af19"
+content-hash = "7573d2d93e14c3789467c413a9e9c3d4bbc94808ed35484b9e7b43ac50f9bef0"
 
 [metadata.files]
 anyio = [
@@ -653,8 +653,8 @@ jinja2 = [
     {file = "Jinja2-3.1.2.tar.gz", hash = "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"},
 ]
 jsf = [
-    {file = "jsf-0.3.2-py3-none-any.whl", hash = "sha256:d38e45adbf60c985255e509cf37ae25e23f110495cad4419813f7c0e442acfb1"},
-    {file = "jsf-0.3.2.tar.gz", hash = "sha256:9f13fa01d0c2ea5d15487b2da225176797ff6e710b7ca3903b982cd537b9d046"},
+    {file = "jsf-0.4.0-py3-none-any.whl", hash = "sha256:05238c4a9da0b288f7ad4c5ca32a5df9326c939cb307cb9aa2ffd694ecf0d293"},
+    {file = "jsf-0.4.0.tar.gz", hash = "sha256:81fc0f3fb8deec47688ce9057296bc2c20bed31bb4876e122c0d8c0e88958f5e"},
 ]
 jsonschema = [
     {file = "jsonschema-4.4.0-py3-none-any.whl", hash = "sha256:77281a1f71684953ee8b3d488371b162419767973789272434bbc3f29d9c8823"},
