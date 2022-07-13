@@ -10,31 +10,37 @@ function set_label(what) {
         text: {
             lines: true,
             label: false,
-            qrtext: false
+            qrtext: false,
+            length: false,
         },
         qr: {
             lines: true,
             label: false,
-            qrtext: true
+            qrtext: true,
+            length: false,
         },
         wrap: {
             lines: false,
             label: true,
             qrtext: false,
+            length: true,
         },
         flag: {
             lines: false,
             label: true,
             qrtext: false,
+            length: false,
         }
     }
 
     for (let [k, v] of Object.entries(elements[what])) {
         // show/hide the appropriate elements
+        let divname = '#' + k + "_div"
+
         if(v) {
-            $('#' + k + "_div").show()
+            $(divname).show()
         } else {
-            $('#' + k + "_div").hide()
+            $(divname).hide()
         }
 
     }
@@ -86,7 +92,7 @@ function get_request_json() {
     var fields = {
         text: ['printer', 'tape', 'fontname', 'size', 'align', 'lines'],
         qr: ['printer', 'tape', 'fontname', 'size', 'align', 'qrtext', 'lines'],
-        wrap: ['printer', 'tape', 'fontname', 'label'],
+        wrap: ['printer', 'tape', 'fontname', 'label', 'length'],
         flag: ['printer', 'tape', 'fontname', 'size', 'label']
     }
 
@@ -105,6 +111,9 @@ function get_request_json() {
 
         } else {
             request[flist[index]] = $('#' + flist[index]).val()
+            if(flist[index] == 'length') {
+                request['length'] = 128 * Number(request['length'])
+            }
         }
     }
 
