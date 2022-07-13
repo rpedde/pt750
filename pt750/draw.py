@@ -1,7 +1,6 @@
 import os
 import subprocess
 from operator import itemgetter
-from typing import Optional
 
 import treepoem
 from PIL import Image, ImageDraw, ImageFont
@@ -42,12 +41,12 @@ def path_for(fontname: str):
         # additionally, let's add any .ttf files found in
         # settings.font_dir
         if settings.font_dirs:
-            for path in settings.font_dirs:
-                for font in os.listdir(path):
+            for fd_path in settings.font_dirs:
+                for font in os.listdir(fd_path):
                     if font.endswith(".ttf"):
-                        _font_cache[font] = os.path.join(path, font)
+                        _font_cache[font] = os.path.join(fd_path, font)
 
-    path: Optional[str] = _font_cache.get(fontname)
+    path = _font_cache.get(fontname)
     if path is None:
         path = _font_cache.get(f"{fontname}.ttf")
 
@@ -67,6 +66,8 @@ def find_fit(fontname: str, size: float, text: str, constrain_height: bool = Tru
     font = ImageFont.truetype(fontname, fontsize)
 
     constraint = itemgetter(1) if constrain_height else itemgetter(0)
+    if constrain_height:
+        text = "bdfhkltgjpgyfz"
 
     while constraint(font.getsize(text)) < size:
         fontsize += 1
