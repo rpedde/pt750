@@ -19,7 +19,7 @@ black = "^22.6.0"
 flake8 = "^4.0.1"
 flake8-import-order = "^0.18.1"
 pytest = "^7.1.2"
-mypy = "^0.961"
+mypy = "^0.971"
 jsf = "^0.4.0"
 requests = "^2.28.1"
 
