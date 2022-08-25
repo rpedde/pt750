@@ -499,7 +499,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "treepoem"
-version = "3.16.0"
+version = "3.17.0"
 description = "Barcode rendering for Python supporting QRcode, Aztec, PDF417, I25, Code128, Code39 and many more types."
 category = "main"
 optional = false
@@ -564,7 +564,7 @@ standard = ["colorama (>=0.4)", "httptools (>=0.4.0)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "690d840c7012b33a89a031ea0e5d830afceeb2c53ac9a230205a6bf3496f10e5"
+content-hash = "7b072049103c225174fab21b08b409488719fe775fd4eef5cc1cfeddb4e59377"
 
 [metadata.files]
 anyio = [
@@ -959,8 +959,8 @@ tomli = [
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
 treepoem = [
-    {file = "treepoem-3.16.0-py3-none-any.whl", hash = "sha256:26d7cc6f236cd29c3e3a58cb883807d131d5187f2c83cd74e66f649ee39aa687"},
-    {file = "treepoem-3.16.0.tar.gz", hash = "sha256:8ae71d46dfbee2d1a7fe16f7057cb9c6db26a9d7ffbfaba71ffb34337ef6c185"},
+    {file = "treepoem-3.17.0-py3-none-any.whl", hash = "sha256:7ed12a50d8641778cd0cee088e1d36b6f640db6e7df0c9f4024f4509cb44a4b3"},
+    {file = "treepoem-3.17.0.tar.gz", hash = "sha256:c0b850ac1c68a7a538c63b6881895733f91e0e1e928d9c66321deb1a889249a4"},
 ]
 typer = [
     {file = "typer-0.4.1-py3-none-any.whl", hash = "sha256:e8467f0ebac0c81366c2168d6ad9f888efdfb6d4e1d3d5b4a004f46fa444b5c3"},
