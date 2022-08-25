@@ -11,7 +11,7 @@ Pillow = "^9.2.0"
 treepoem = "^3.16.0"
 fastapi = "^0.79.0"
 Jinja2 = "^3.1.2"
-uvicorn = "^0.18.2"
+uvicorn = "^0.18.3"
 PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
