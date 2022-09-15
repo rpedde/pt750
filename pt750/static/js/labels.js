@@ -152,7 +152,7 @@ function print() {
 function update_preview() {
     request = get_request_json()
 
-    max_size = $('#preview_div').width()
+    max_size = Math.trunc($('#preview_div').width())
 
     $.ajax({
         type: "PUT",
