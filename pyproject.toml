@@ -15,7 +15,7 @@ uvicorn = "^0.18.3"
 PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
-black = "^22.6.0"
+black = "^22.10.0"
 flake8 = "^5.0.4"
 flake8-import-order = "^0.18.1"
 pytest = "^7.1.3"
