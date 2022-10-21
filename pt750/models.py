@@ -86,6 +86,11 @@ class LabelRequest(BaseModel):
     count: int = 1
 
 
+class PrinterStatus(BaseModel):
+    media: Tapes = None
+    ready: bool
+
+
 class Settings(BaseSettings):
     printers: Union[str, dict[str, str]] = "default=file:///dev/null"
     font_dirs: Union[None, str, list[str]] = None

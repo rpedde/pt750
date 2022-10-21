@@ -5,6 +5,10 @@ ENV PYTHONPATH=/app
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
     ghostscript \
+    libsnmp-dev \
+    libudev-dev \
+    libsnmp-base \
+    snmp-mibs-downloader \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 

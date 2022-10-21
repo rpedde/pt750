@@ -23,6 +23,20 @@ templates = Jinja2Templates(directory=template_dir)
 
 settings = models.Settings()
 
+_drivers = {}
+
+
+def _driver_for(printer: str) -> transports.LabelPrinter:
+    if printer not in _drivers:
+        uri = settings.printers.get(printer)
+
+        if not uri:
+            raise models.ParameterError("printer not found")
+
+        _drivers[printer] = transports.PT750W(uri)
+
+    return _drivers[printer]
+
 
 def _image_for_request(request: models.LabelRequest):
     label_info = request.dict()["label"]
@@ -64,10 +78,13 @@ async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
+@app.get("/status")
+async def status():
+    return {printer: _driver_for(printer).status() for printer in settings.printers}
+
+
 @app.get("/config")
 async def config():
-    print(settings)
-
     response = {
         "tapes": list(models.tapes.keys()),
         "printers": list(settings.printers.keys()),
@@ -89,9 +106,7 @@ async def print(label_request: models.LabelRequest):
     out_img = Image.new(mode="1", size=(final_width, 128), color=1)
     out_img.paste(img, (0, final_ofs))
 
-    printer_uri = settings.printers[label_request.label.printer]  # type: ignore
-
-    driver = transports.PT750W(printer_uri)
+    driver = _driver_for(label_request.label.printer)
     driver.print(out_img)
 
 
