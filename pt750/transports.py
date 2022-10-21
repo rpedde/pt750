@@ -1,7 +1,10 @@
 import socket
 from urllib.parse import urlparse
 
+from easysnmp import Session
 from PIL import Image
+
+from pt750.models import PrinterStatus, tapes
 
 
 class LabelPrinter:
@@ -12,6 +15,12 @@ class LabelPrinter:
             self.transport = TCPTransport(self.uri)
         else:
             raise RuntimeError("cannot find transport")
+
+    def print(self, img: Image):
+        raise NotImplementedError
+
+    def status(self):
+        raise NotImplementedError
 
 
 class PT750W(LabelPrinter):
@@ -48,20 +57,51 @@ class PT750W(LabelPrinter):
 
         self.transport.send_bytes(bytes)
 
+    def status(self) -> PrinterStatus:
+        return self.transport.get_status()
+
 
 class Transport:
     def __init__(self, uri):
         self.uri = uri
 
+    def send_bytes(self, bytes: bytes):
+        raise NotImplementedError
+
+    def get_status(self) -> PrinterStatus:
+        raise NotImplementedError
+
 
 class TCPTransport(Transport):
-    def send_bytes(self, bytes):
+    MEDIA_OID = ".1.3.6.1.2.1.43.8.2.1.12.1.1"
+    STATUS_OID = ".1.3.6.1.2.1.43.8.2.1.11.1.1"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
         parts = urlparse(self.uri)
+        self.host = parts.hostname
+        self.port = parts.port if parts.port else 9100
 
-        hostname = parts.hostname
-        port = parts.port if parts.port else 9100
+        # I don't believe this is configurable for the printer... I believe it's
+        # just plain always on with v2c/public read-only
+        self.snmp = Session(hostname=self.host, community="public", version=2)
 
+    def send_bytes(self, bytes):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((hostname, port))
+        s.connect((self.host, self.port))
         s.sendall(bytes)
         s.close()
+
+    def get_status(self) -> PrinterStatus:
+        media_descriptor = self.snmp.get(self.MEDIA_OID)
+        status = self.snmp.get(self.STATUS_OID)
+
+        ready = int(status.value) in [0, 2, 4, 6]
+
+        media = None
+        for tape in tapes:
+            if media_descriptor.value.startswith(tape):
+                media = tape
+
+        return PrinterStatus(media=media, ready=ready)

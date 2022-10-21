@@ -1,7 +1,9 @@
 var active_label = 'text'
+var printer_ready = false
 
 function onload() {
     update_config()
+    update_status()
     set_label('text')
 }
 
@@ -58,6 +60,38 @@ function set_label(what) {
     update_preview()
 }
 
+function update_status(async=false) {
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "/status",
+        async: async
+    }).done(function(data) {
+        printer = $('#printer').val()
+        tape = data[printer]["media"]
+        ready = data[printer]["ready"]
+
+        if(!ready) {
+            $('#warning_div').removeClass('alert-success')
+            $('#warning_div').addClass('alert-danger')
+            $('#warning_div').html('printer not ready')
+        } else {
+            if (!printer_ready) {
+                $('#warning_div').removeClass('alert-danger')
+                $('#warning_div').addClass('alert-success')
+                $('#warning_div').html('Ok')
+            }
+        }
+
+        printer_ready = ready
+        $('#tape').val(tape)
+    }).fail(function(jqXHR) {
+        $('#warning_div').removeClass('alert-success')
+        $('#warning_div').addClass('alert-danger')
+        $('#warning_div').html('Failure: ' + jqXHR.responseText)
+    })
+}
+
 function update_config() {
     $.ajax({
         type: "GET",
@@ -108,7 +142,6 @@ function get_request_json() {
         } else if (flist[index] == 'lines') {
             linearray = $('#lines').val().split('\n')
             request['lines'] = linearray
-
         } else {
             request[flist[index]] = $('#' + flist[index]).val()
             if(flist[index] == 'length') {
@@ -132,6 +165,10 @@ function get_request_json() {
 function print() {
     request = get_request_json()
 
+    $('#warning_div').removeClass('alert-danger')
+    $('#warning_div').addClass('alert-success')
+    $('#warning_div').html('Printing...')
+
     $.ajax({
         type: "PUT",
         dataType: "json",
@@ -150,6 +187,7 @@ function print() {
 }
 
 function update_preview() {
+    update_status()
     request = get_request_json()
 
     max_size = Math.trunc($('#preview_div').width())

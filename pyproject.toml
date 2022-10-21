@@ -13,6 +13,7 @@ fastapi = "^0.85.0"
 Jinja2 = "^3.1.2"
 uvicorn = "^0.18.3"
 PyYAML = "^6.0"
+easysnmp = "^0.2.6"
 
 [tool.poetry.dev-dependencies]
 black = "^22.10.0"
