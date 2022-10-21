@@ -3,6 +3,7 @@ FROM python:3.9
 WORKDIR /app
 ENV PYTHONPATH=/app
 
+RUN sed -i /etc/apt/sources.list -e 's/ main/ main contrib non-free/'
 RUN apt-get update && apt-get install --no-install-recommends -y \
     ghostscript \
     libsnmp-dev \
