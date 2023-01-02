@@ -7,7 +7,7 @@ license = "GPL3"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-Pillow = "^9.2.0"
+Pillow = "^9.4.0"
 treepoem = "^3.17.0"
 fastapi = "^0.85.0"
 Jinja2 = "^3.1.2"
