@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build and Publish
-        uses: elgohr/Publish-Docker-Github-Action@757f58a82c2851acf641d0410b80e98680811614
+        uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: rpedde/pt750/pt750
           username: ${{ github.actor }}
