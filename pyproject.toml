@@ -9,7 +9,7 @@ license = "GPL3"
 python = "^3.9"
 Pillow = "*"
 treepoem = "*"
-fastapi = {extras = ["all"], version = "^0.95.0"}
+fastapi = {extras = ["all"], version = "^0.95.1"}
 Jinja2 = "*"
 uvicorn = "*"
 PyYAML = "*"
