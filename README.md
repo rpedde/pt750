@@ -49,3 +49,7 @@ as such:
 0.2.0: Add web interface
 
 0.1.0: Initial release
+
+## Notes
+
+Raster Documentation: https://download.brother.com/welcome/docp100064/cv_pte550wp750wp710bt_eng_raster_102.pdf

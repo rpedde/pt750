@@ -13,6 +13,8 @@ class LabelPrinter:
         parts = urlparse(self.uri)
         if parts.scheme == "tcp":
             self.transport = TCPTransport(self.uri)
+        elif parts.scheme == "file":
+            self.transport = USBTransport(self.uri)
         else:
             raise RuntimeError("cannot find transport")
 
@@ -34,7 +36,7 @@ class PT750W(LabelPrinter):
             image_data[idx] = image_data[idx] ^ 0xFF
 
         bytes = b"\x00" * 100  # reset stream
-        bytes += b"\x1B\x40"  # inittialize
+        bytes += b"\x1B\x40"  # initialize
         bytes += b"\x1B\x69\x4D\x40"  # auto tape cut
         bytes += b"\x1B\x69\x4B\x08"  # no chain printing, low res (128?)
         bytes += b"\x4d\x02"  # compression
@@ -70,6 +72,43 @@ class Transport:
 
     def get_status(self) -> PrinterStatus:
         raise NotImplementedError
+
+
+class USBTransport(Transport):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        parts = urlparse(self.uri)
+        self.path = parts.path
+
+    def send_bytes(self, bytes):
+        with open(self.path, "wb") as f:
+            f.write(bytes)
+
+    def get_status(self) -> PrinterStatus:
+        max_attempts = 3
+
+        while max_attempts:
+            with open(self.path, "w+b") as f:
+                f.write(b"\x00" * 100)  # Invalidate
+                f.write(b"\x1B\x69\x53")
+                raw_status = f.read(32)
+
+                if len(raw_status) < 32:
+                    max_attempts -= 1
+                else:
+                    break
+
+        if not max_attempts:
+            return None
+
+        media = None
+        media_mm = int(raw_status[10])
+        if media_mm:
+            media = f"{media_mm}mm"
+
+        # we need media and ready status
+        return PrinterStatus(media=media, ready=True)
 
 
 class TCPTransport(Transport):
