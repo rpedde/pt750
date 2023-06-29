@@ -3,7 +3,8 @@ FROM python:3.9
 WORKDIR /app
 ENV PYTHONPATH=/app
 
-RUN sed -i /etc/apt/sources.list -e 's/ main/ main contrib non-free/'
+RUN sed -i /etc/apt/sources.list -e 's/ main/ main contrib non-free/' || /bin/true
+RUN sed -i /etc/apt/sources.list.d/debian.sources -e 's/Components: main/Components: main contrib non-free/' || /bin/true
 RUN apt-get update && apt-get install --no-install-recommends -y \
     ghostscript \
     libsnmp-dev \
