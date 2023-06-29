@@ -96,18 +96,22 @@ async def config():
 
 @app.put("/print")
 async def print(label_request: models.LabelRequest):
-    img = _image_for_request(label_request)
-
-    final_width = img.width
-
-    tape = label_request.label.tape.value
-    final_ofs = models.tapes[tape].offset
-
-    out_img = Image.new(mode="1", size=(final_width, 128), color=1)
-    out_img.paste(img, (0, final_ofs))
-
     driver = _driver_for(label_request.label.printer)
-    driver.print(out_img)
+
+    if label_request.label.label_type != "raw":
+        img = _image_for_request(label_request)
+
+        final_width = img.width
+
+        tape = label_request.label.tape.value
+        final_ofs = models.tapes[tape].offset
+
+        out_img = Image.new(mode="1", size=(final_width, 128), color=1)
+        out_img.paste(img, (0, final_ofs))
+
+        driver.print(out_img)
+    else:
+        driver.transport.send_bytes(base64.b64decode(label_request.label.b64_bytes))
 
 
 @app.put("/preview")
@@ -134,4 +138,4 @@ async def preview(label_request: models.LabelRequest, max_width: int = 0):
 
 
 if __name__ == "__main__":
-    uvicorn.run("pt750.web:app", host="0.0.0.0", port=5000, reload=True)
+    uvicorn.run("pt750.web:app", host="0.0.0.0", port=settings.port, reload=True)

@@ -1,6 +1,9 @@
+import base64
+import logging
 import socket
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
+import requests
 from easysnmp import Session
 from PIL import Image
 
@@ -15,6 +18,8 @@ class LabelPrinter:
             self.transport = TCPTransport(self.uri)
         elif parts.scheme == "file":
             self.transport = USBTransport(self.uri)
+        elif parts.scheme in ["http", "https"]:
+            self.transport = HTTPTransport(self.uri)
         else:
             raise RuntimeError("cannot find transport")
 
@@ -144,3 +149,42 @@ class TCPTransport(Transport):
                 media = tape
 
         return PrinterStatus(media=media, ready=ready)
+
+
+class HTTPTransport(Transport):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        parts = urlparse(self.uri)
+        self.printer = parts.path.rsplit("/", 1)[-1]
+        parts = parts._replace(path=parts.path.rsplit("/", 1)[0])
+        self.base_uri = urlunparse(parts)
+
+    def get_status(self) -> PrinterStatus:
+        rv = requests.get(f"{self.base_uri}/status")
+        if not rv.ok:
+            logging.error(f"Error getting status for {self.printer}: {rv.status_code}")
+            return PrinterStatus(media="24mm", ready=False)
+
+        body = rv.json()
+        if self.printer not in body:
+            logging.error(f"Remote does not have printer {self.printer}")
+            return PrinterStatus(media="24mm", ready=False)
+
+        return PrinterStatus(**body[self.printer])
+
+    def send_bytes(self, bytes):
+        request = {
+            "count": 1,
+            "label": {
+                "label_type": "raw",
+                "b64_bytes": base64.b64encode(bytes).decode(),
+                "printer": self.printer,
+                # these are no-op
+                "tape": "6mm",
+                "fontname": "mono",
+            },
+        }
+
+        rv = requests.put(f"{self.base_uri}/print", json=request)
+        rv.raise_for_status()

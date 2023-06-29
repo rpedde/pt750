@@ -55,6 +55,11 @@ class TextLabelRequest(BaseLabel):
     lines: list[str]
 
 
+class RawLabelRequest(BaseLabel):
+    label_type: Literal["raw"]
+    b64_bytes: str
+
+
 class QRLabelRequest(BaseLabel):
     label_type: Literal["qr"]
 
@@ -82,7 +87,13 @@ class FlagLabelRequest(BaseLabel):
 
 
 class LabelRequest(BaseModel):
-    label: Union[TextLabelRequest, QRLabelRequest, WrapLabelRequest, FlagLabelRequest]
+    label: Union[
+        FlagLabelRequest,
+        QRLabelRequest,
+        RawLabelRequest,
+        TextLabelRequest,
+        WrapLabelRequest,
+    ]
     count: int = 1
 
 
@@ -95,6 +106,7 @@ class Settings(BaseSettings):
     printers: Union[str, dict[str, str]] = "default=file:///dev/null"
     font_dirs: Union[None, str, list[str]] = None
     font_map: Union[str, dict[str, str]] = ""
+    port: int = 5000
 
     @validator("font_dirs")
     def comma_separated(cls, v):
