@@ -1,5 +1,6 @@
 import base64
 import logging
+import os
 import socket
 from urllib.parse import urlparse, urlunparse
 
@@ -87,11 +88,17 @@ class USBTransport(Transport):
         self.path = parts.path
 
     def send_bytes(self, bytes):
+        if not os.path.exists(self.path):
+            raise RuntimeError("Printer offline")
+
         with open(self.path, "wb") as f:
             f.write(bytes)
 
     def get_status(self) -> PrinterStatus:
         max_attempts = 3
+
+        if not os.path.exists(self.path):
+            return PrinterStatus(media="24mm", ready=False)
 
         while max_attempts:
             with open(self.path, "w+b") as f:
@@ -105,7 +112,7 @@ class USBTransport(Transport):
                     break
 
         if not max_attempts:
-            return None
+            return PrinterStatus(media="24mm", ready=False)
 
         media = None
         media_mm = int(raw_status[10])
