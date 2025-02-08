@@ -45,6 +45,14 @@
           </li>
           <li class="nav-item">
             <a
+              id="aruco_nav"
+              href="javascript:set_label('aruco')"
+              class="nav-link"
+              >Aruco</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
               id="flag_nav"
               href="javascript:set_label('flag')"
               class="nav-link"
@@ -224,6 +232,26 @@ example label</textarea
                 onchange="update_preview()"
                 placeholder="QR Data"
               />
+            </div>
+
+            <div id="id_div" class="mb-3">
+              <label class="form-label" for="id">ID</label>
+              <input
+                class="form-control"
+                id="id"
+                onchange="update_preview()"
+                placeholder="0"
+              />
+            </div>
+
+            <div id="dictionary_div" class="mb-3">
+              <label class="form-label" for="dictionary">Dictionary</label>
+              <select
+                <input
+                class="form-select"
+                id="dictionary"
+                onclick="update_preview()"
+              ></select>
             </div>
 
             <div id="label_div" class="mb-3">

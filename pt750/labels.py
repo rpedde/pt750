@@ -1,3 +1,4 @@
+import cv2
 from typing import Optional
 
 from PIL import Image, ImageDraw
@@ -6,15 +7,20 @@ from pt750 import draw, models
 
 
 class Label:
+    def __init__(self):
+        self.img = None
+
     @property
     def image(self):
         return self.img
 
     @property
     def bytes(self):
+        assert self.img
         return self.img.to_bytes()
 
-    def save(self, filename):
+    def save(self, filename: str):
+        assert self.img
         self.img.save(filename)
 
 
@@ -83,6 +89,56 @@ class QRLabel(Label):
             img.paste(text_img, (qr_img.width + self.padding, 0))
         else:
             img = qr_img
+
+        self.img = img
+
+
+class ArucoLabel(Label):
+    def __init__(
+        self,
+        height: int,
+        fontname: str,
+        dictionary: str = "DICT_4X4_100",
+        id: int = 0,
+        size: str = "large",
+        padding: int = 10,
+        align: models.HAlignment = models.HAlignment.left,
+        lines: Optional[list[str]] = None,
+    ):
+        self.height = height
+        self.fontname = fontname
+        self.dictionary = dictionary
+        self.id = id
+        self.size = size
+        self.padding = padding
+        self.align = align
+        self.lines = lines
+        if self.lines is None:
+            self.lines = []
+
+        if lines and not all(x for x in lines):
+            raise models.ParameterError("Empty lines not allowed")
+
+        self.generate()
+
+    def generate(self):
+        dictionary_idx = getattr(models.ArucoDictionary, self.dictionary, 0)
+        aruco_dict = cv2.aruco.getPredefinedDictionary(dictionary_idx)
+        aruco_cv_img = cv2.aruco.generateImageMarker(aruco_dict, self.id, self.height)
+
+        color_coverted = cv2.cvtColor(aruco_cv_img, cv2.COLOR_BGR2RGB)
+        aruco_img = Image.fromarray(color_coverted)
+
+        if self.lines and all(x for x in self.lines):
+            text_img = draw.horiz_text_block(
+                self.height, self.fontname, self.size, self.lines, self.align
+            )
+            width = aruco_img.width + text_img.width + self.padding
+            img = Image.new(mode="1", size=(width, self.height), color=1)
+            img.paste(aruco_img)
+            img.paste(text_img, (aruco_img.width + self.padding, 0))
+        else:
+            img = aruco_img
 
         self.img = img
 

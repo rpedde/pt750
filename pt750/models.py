@@ -1,7 +1,9 @@
-from enum import Enum
-from typing import Literal, Union
+from enum import Enum, IntEnum
+from typing import Any, Literal, Union
 
-from pydantic import BaseModel, BaseSettings, validator
+import cv2
+from pydantic import BaseModel, Field, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class ParameterError(Exception):
@@ -19,6 +21,30 @@ class Tapes(Enum):
     size_12mm = "12mm"
     size_9mm = "9mm"
     size_6mm = "6mm"
+
+
+class ArucoDictionary(IntEnum):
+    DICT_4X4_50 = cv2.aruco.DICT_4X4_50
+    DICT_4X4_100 = cv2.aruco.DICT_4X4_100
+    DICT_4X4_250 = cv2.aruco.DICT_4X4_250
+    DICT_4X4_1000 = cv2.aruco.DICT_4X4_1000
+    DICT_5X5_50 = cv2.aruco.DICT_5X5_50
+    DICT_5X5_100 = cv2.aruco.DICT_5X5_100
+    DICT_5X5_250 = cv2.aruco.DICT_5X5_250
+    DICT_5X5_1000 = cv2.aruco.DICT_5X5_1000
+    DICT_6X6_50 = cv2.aruco.DICT_6X6_50
+    DICT_6X6_100 = cv2.aruco.DICT_6X6_100
+    DICT_6X6_250 = cv2.aruco.DICT_6X6_250
+    DICT_6X6_1000 = cv2.aruco.DICT_6X6_1000
+    DICT_7X7_50 = cv2.aruco.DICT_7X7_50
+    DICT_7X7_100 = cv2.aruco.DICT_7X7_100
+    DICT_7X7_250 = cv2.aruco.DICT_7X7_250
+    DICT_7X7_1000 = cv2.aruco.DICT_7X7_1000
+    DICT_ARUCO_ORIGINAL = cv2.aruco.DICT_ARUCO_ORIGINAL
+    DICT_APRILTAG_16h5 = cv2.aruco.DICT_APRILTAG_16h5
+    DICT_APRILTAG_25h9 = cv2.aruco.DICT_APRILTAG_25h9
+    DICT_APRILTAG_36h10 = cv2.aruco.DICT_APRILTAG_36h10
+    DICT_APRILTAG_36h11 = cv2.aruco.DICT_APRILTAG_36h11
 
 
 tapes = {
@@ -70,6 +96,17 @@ class QRLabelRequest(BaseLabel):
     lines: list[str] = []
 
 
+class ArucoLabelRequest(BaseLabel):
+    label_type: Literal["aruco"]
+
+    align: HAlignment
+    padding: int = 10
+    size: str = "large"
+    dictionary: str
+    id: int
+    lines: list[str] = []
+
+
 class WrapLabelRequest(BaseLabel):
     label_type: Literal["wrap"]
 
@@ -90,15 +127,16 @@ class LabelRequest(BaseModel):
     label: Union[
         FlagLabelRequest,
         QRLabelRequest,
+        ArucoLabelRequest,
         RawLabelRequest,
         TextLabelRequest,
         WrapLabelRequest,
-    ]
+    ] = Field(discriminator="label_type")
     count: int = 1
 
 
 class PrinterStatus(BaseModel):
-    media: Tapes = None
+    media: Tapes | None = None
     ready: bool
 
 
@@ -108,21 +146,22 @@ class Settings(BaseSettings):
     font_map: Union[str, dict[str, str]] = ""
     port: int = 5000
 
-    @validator("font_dirs")
-    def comma_separated(cls, v):
-        if v is None:
+    model_config = SettingsConfigDict(env_prefix="l_")
+
+    @field_validator("font_dirs", mode="before")
+    @classmethod
+    def comma_separated(cls, value: Any) -> Any:
+        if value is None:
             return None
 
-        return list(map(str.strip, v.split(",")))
+        return list(map(str.strip, value.split(",")))
 
-    @validator("printers", "font_map")
-    def kvpairs(cls, v):
-        if v:
-            return dict([x.split("=") for x in v.split(",")])
+    @field_validator("printers", "font_map", mode="before")
+    @classmethod
+    def kvpairs(cls, value: Any) -> Any:
+        if value:
+            return dict([x.split("=") for x in value.split(",")])
         return {}
-
-    class Config:
-        env_prefix = "l_"
 
 
 settings = Settings()

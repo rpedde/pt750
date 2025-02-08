@@ -1,4 +1,4 @@
-""" testing web previews actually exercises most of the stack """
+"""testing web previews actually exercises most of the stack"""
 
 import json
 import random
@@ -7,13 +7,13 @@ import string
 import pytest
 from fastapi.testclient import TestClient
 from jsf import JSF
-
 from pt750 import models, web
 
 
 @pytest.fixture
 def client():
-    yield TestClient(web.app)
+    client = TestClient(web.app)
+    yield client
 
 
 def a_random_integer(min=-2147483648, max=2147483647, nullable=False):
@@ -39,7 +39,7 @@ def a_random_string(min_len=None, max_len=None, nullable=False):
 
 
 def a_random_model(model, **kwargs):
-    faker = JSF(model.schema())
+    faker = JSF(model.model_json_schema())
     proposed = faker.generate()
 
     if "fontname" in proposed:
@@ -51,6 +51,18 @@ def a_random_model(model, **kwargs):
     if "lines" in proposed:
         line_count = random.randint(1, 4)
         proposed["lines"] = [a_random_string() for _ in range(line_count)]
+
+    if "min_count" in proposed:
+        proposed["min_count"] = random.randint(4, 8)
+
+    if "padding" in proposed:
+        proposed["padding"] = random.randint(0, 10)
+
+    if "label" in proposed and not proposed["label"]:
+        proposed["label"] = a_random_string()
+
+    if "qrtext" in proposed and not proposed["qrtext"]:
+        proposed["qrtext"] = a_random_string()
 
     for k, v in kwargs.items():
         if v is not None:

@@ -14,24 +14,41 @@ function set_label(what) {
             label: false,
             qrtext: false,
             length: false,
+            id: false,
+            dictionary: false,
         },
         qr: {
             lines: true,
             label: false,
             qrtext: true,
             length: false,
+            id: false,
+            dictionary: false,
         },
         wrap: {
             lines: false,
             label: true,
             qrtext: false,
             length: true,
+            id: false,
+            dictionary: false,
         },
         flag: {
             lines: false,
             label: true,
             qrtext: false,
             length: false,
+            id: false,
+            dictionary: false,
+        },
+        aruco: {
+            lines: true,
+            label: false,
+            qrtext: false,
+            length: false,
+            id: true,
+            dictionary: true,
+
         }
     }
 
@@ -115,6 +132,14 @@ function update_config() {
             opt = '<option value="' + fonts[index] + '">' + fonts[index] + '</option>'
             $('#fontname').append(opt)
         }
+
+	dictionaries = data["dictionaries"]
+        for(index = 0; index < dictionaries.length; index++) {
+            opt = '<option value="' + dictionaries[index] + '">' + dictionaries[index] + '</option>'
+            $('#dictionary').append(opt)
+        }
+
+
     }).fail(function(jqXHR) {
         $('#warning_div').removeClass('alert-success')
         $('#warning_div').addClass('alert-danger')
@@ -127,7 +152,8 @@ function get_request_json() {
         text: ['printer', 'tape', 'fontname', 'size', 'align', 'lines'],
         qr: ['printer', 'tape', 'fontname', 'size', 'align', 'qrtext', 'lines'],
         wrap: ['printer', 'tape', 'fontname', 'label', 'length'],
-        flag: ['printer', 'tape', 'fontname', 'size', 'label']
+        flag: ['printer', 'tape', 'fontname', 'size', 'label'],
+	aruco: ['printer', 'tape', 'fontname', 'size', 'align', 'lines', 'id', 'dictionary']
     }
 
     var request = {
