@@ -39,7 +39,7 @@ def _driver_for(printer: str) -> transports.LabelPrinter:
 
 
 def _image_for_request(request: models.LabelRequest):
-    label_info = request.dict()["label"]
+    label_info = request.model_dump()["label"]
 
     label_type = label_info.pop("label_type")
 
@@ -59,6 +59,8 @@ def _image_for_request(request: models.LabelRequest):
         img = labels.WrapLabel(height=height, **label_info).image
     elif label_type == "flag":
         img = labels.FlagLabel(height=height, **label_info).image
+    elif label_type == "aruco":
+        img = labels.ArucoLabel(height=height, **label_info).image
 
     return img
 
@@ -89,6 +91,7 @@ async def config():
         "tapes": list(models.tapes.keys()),
         "printers": list(settings.printers.keys()),
         "fonts": list(draw.font_map.keys()),
+        "dictionaries": [item.name for item in models.ArucoDictionary],
     }
 
     return response

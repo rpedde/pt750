@@ -7,7 +7,6 @@ from PIL import Image, ImageDraw, ImageFont
 
 from pt750.models import HAlignment, settings
 
-
 _font_cache: dict[str, str] = {}
 
 font_sizes = {"large": 1.0, "medium": 0.75, "small": 0.5}
@@ -20,6 +19,11 @@ font_map = {
 }
 
 font_map.update(settings.font_map)  # type: ignore
+
+
+def getsize(font, text: str):
+    left, top, right, bottom = font.getbbox(text)
+    return (right, bottom)
 
 
 def path_for(fontname: str):
@@ -69,7 +73,7 @@ def find_fit(fontname: str, size: float, text: str, constrain_height: bool = Tru
     if constrain_height:
         text = "bdfhkltgjpgyfz"
 
-    while constraint(font.getsize(text)) < size:
+    while constraint(getsize(font, text)) < size:
         fontsize += 1
         font = ImageFont.truetype(fontname, fontsize)
 
@@ -81,7 +85,7 @@ def qr_code(height: int, text: str):
 
     code = treepoem.generate_barcode(barcode_type="qrcode", data=text)
 
-    code_img = code.resize((height, height), resample=Image.NEAREST)
+    code_img = code.resize((height, height), resample=Image.Resampling.NEAREST)
     img.paste(code_img)
     return img
 
@@ -103,7 +107,7 @@ def vertical_text_block(width: int, height: int, fontname: str, text: str, min_c
     img = Image.new("1", size=(width, height), color=1)
     draw = ImageDraw.Draw(img)
 
-    line_height = font.getsize(text)[1]
+    line_height = getsize(font, text)[1]
 
     line_count = height // line_height
 
@@ -140,14 +144,14 @@ def horiz_text_block(
     # find max width
     width = 0
     for line in lines:
-        width = max(width, font.getsize(line)[0])
+        width = max(width, getsize(font, line)[0])
 
     img = Image.new(mode="1", size=(width, height), color=1)
 
     draw = ImageDraw.Draw(img)
 
     for idx, line in enumerate(lines):
-        line_width = font.getsize(line)[0]
+        line_width = getsize(font, line)[0]
 
         if alignment == HAlignment.left:
             xofs = 0

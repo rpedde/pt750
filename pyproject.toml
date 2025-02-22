@@ -6,14 +6,17 @@ authors = ["rpedde <ron@pedde.com>"]
 license = "GPL3"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 Pillow = "*"
 treepoem = "*"
-fastapi = {extras = ["all"], version = "^0.96.0"}
+fastapi = {extras = ["all"], version = "*"}
 Jinja2 = "*"
 uvicorn = "*"
 PyYAML = "*"
 easysnmp = "*"
+opencv-python = "^4.11.0.86"
+httpx = "^0.28.1"
+pydantic-settings = "^2.7.1"
 
 [tool.poetry.dev-dependencies]
 black = "*"
