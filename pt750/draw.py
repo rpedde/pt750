@@ -26,12 +26,7 @@ def getsize(font, text: str):
     return (right, bottom)
 
 
-def path_for(fontname: str):
-    if fontname.startswith("/"):
-        return fontname
-
-    fontname = font_map.get(fontname, fontname)
-
+def _update_font_cache():
     if not _font_cache:
         path_lists = subprocess.check_output(["fc-list", "-f", "%{file}\n"]).decode()
 
@@ -49,6 +44,15 @@ def path_for(fontname: str):
                 for font in os.listdir(fd_path):
                     if font.endswith(".ttf"):
                         _font_cache[font] = os.path.join(fd_path, font)
+
+
+def path_for(fontname: str):
+    if fontname.startswith("/"):
+        return fontname
+
+    fontname = font_map.get(fontname, fontname)
+
+    _update_font_cache()
 
     path = _font_cache.get(fontname)
     if path is None:
@@ -125,7 +129,6 @@ def horiz_text_block(
     lines: list[str],
     alignment: HAlignment = HAlignment.left,
 ):
-
     fontpath = path_for(fontname)
     if not fontpath:
         raise RuntimeError(f"Cannot find font {fontname}")

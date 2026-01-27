@@ -1,47 +1,62 @@
-[tool.poetry]
+[project]
 name = "pt750"
-version = "0.2.1"
+dynamic = ["version"]
 description = "label printing tools for brother PT-P750W label maker"
-authors = ["rpedde <ron@pedde.com>"]
-license = "GPL3"
+authors = [{ name = "rpedde", email = "ron@pedde.com" }]
+requires-python = ">=3.10,<4.0"
+license = "GPL-3.0-only"
+license-files = ["LICENSE"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "Pillow",
+    "treepoem",
+    "fastapi[all]",
+    "Jinja2",
+    "uvicorn",
+    "PyYAML",
+    "easysnmp",
+    "opencv-python",
+    "httpx",
+    "pydantic-settings",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-Pillow = "*"
-treepoem = "*"
-fastapi = {extras = ["all"], version = "*"}
-Jinja2 = "*"
-uvicorn = "*"
-PyYAML = "*"
-easysnmp = "*"
-opencv-python = "^4.11.0.86"
-httpx = "^0.28.1"
-pydantic-settings = "^2.7.1"
-
-[tool.poetry.dev-dependencies]
-black = "*"
-flake8 = "*"
-flake8-import-order = "*"
-pytest = "*"
-mypy = "*"
-jsf = "*"
-requests = "*"
-
-[tool.poetry.scripts]
+[project.scripts]
 makelabel = "pt750.main:main"
 
-[[tool.mypy.overrides]]
-module = "PIL"
-ignore_missing_imports = true
+[tool.uv]
+cache-keys = [{ file = "pyproject.toml" }, { git = { commit = true, tags = true }}]
 
-[[tool.mypy.overrides]]
-module = "uvicorn"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "jsf"
-ignore_missing_imports = true
+[dependency-groups]
+dev = [
+    "pytest",
+    "mypy",
+    "jsf",
+    "requests",
+    "ruff",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.hatch.build.hooks.version]
+path = "pt750/_version.py"
+template = '''
+__version__ = "{version}"
+'''
+
+[tool.ruff]
+line-length = 119
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "C90"]

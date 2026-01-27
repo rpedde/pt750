@@ -4,12 +4,13 @@ import argparse
 
 from PIL import Image
 
-from pt750 import labels, models, transports
+from pt750 import __version__, labels, models, transports
 
 
 def get_parser():
     parser = argparse.ArgumentParser(description="make a label")
 
+    parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument("--outfile", default="out.png")
     parser.add_argument("--printer")
     parser.add_argument("--tape", default="24mm")
@@ -59,9 +60,7 @@ def main():
 
     if args.kind == "text":
         align = models.HAlignment(args.align)
-        label = labels.TextLabel(
-            height, args.font, args.line, align=align, size=args.size
-        )
+        label = labels.TextLabel(height, args.font, args.line, align=align, size=args.size)
 
         img = label.image
 
@@ -82,20 +81,14 @@ def main():
         qrtext = f"WIFI:T:WPA;S:{args.ssid};P:{args.password};;"
         lines = [f"SSID: {args.ssid}", f"PASS: {args.password}"]
 
-        label = labels.QRLabel(
-            height, args.font, qrtext, size=args.size, padding=args.padding, lines=lines
-        )
+        label = labels.QRLabel(height, args.font, qrtext, size=args.size, padding=args.padding, lines=lines)
         img = label.image
     elif args.kind == "wrap":
-        label = labels.WrapLabel(
-            height, args.font, args.label, length=args.length, min_count=args.min_count
-        )
+        label = labels.WrapLabel(height, args.font, args.label, length=args.length, min_count=args.min_count)
         img = label.image
 
     elif args.kind == "flag":
-        label = labels.FlagLabel(
-            height, args.font, args.label, size=args.size, padding=args.padding
-        )
+        label = labels.FlagLabel(height, args.font, args.label, size=args.size, padding=args.padding)
         img = label.image
     else:
         raise RuntimeError("invalid label kind")
