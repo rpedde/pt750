@@ -35,9 +35,6 @@ cache-keys = [{ file = "pyproject.toml" }, { git = { commit = true, tags = true 
 
 [dependency-groups]
 dev = [
-    "black",
-    "flake8",
-    "flake8-import-order",
     "pytest",
     "mypy",
     "jsf",
