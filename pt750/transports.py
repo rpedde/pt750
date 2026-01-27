@@ -41,9 +41,9 @@ class PT750W(LabelPrinter):
             image_data[idx] = image_data[idx] ^ 0xFF
 
         bytes = b"\x00" * 100  # reset stream
-        bytes += b"\x1B\x40"  # initialize
-        bytes += b"\x1B\x69\x4D\x40"  # auto tape cut
-        bytes += b"\x1B\x69\x4B\x08"  # no chain printing, low res (128?)
+        bytes += b"\x1b\x40"  # initialize
+        bytes += b"\x1b\x69\x4d\x40"  # auto tape cut
+        bytes += b"\x1b\x69\x4b\x08"  # no chain printing, low res (128?)
         bytes += b"\x4d\x02"  # compression
 
         label_width = img.width
@@ -57,7 +57,7 @@ class PT750W(LabelPrinter):
             row_bytes = image_data[byte_ofs : byte_ofs + bytes_per_line]  # noqa: E203
 
             # raster graphics transfer
-            bytes += b"\x47\x11\x00\x0F"  # "compressed" 16 literal bytes
+            bytes += b"\x47\x11\x00\x0f"  # "compressed" 16 literal bytes
             bytes += row_bytes
 
         bytes += b"\x1a"  # print and feed
@@ -96,7 +96,7 @@ class USBTransport(Transport):
         while max_attempts:
             with open(self.path, "w+b") as f:
                 f.write(b"\x00" * 100)  # Invalidate
-                f.write(b"\x1B\x69\x53")
+                f.write(b"\x1b\x69\x53")
                 raw_status = f.read(32)
 
                 if len(raw_status) < 32:

@@ -1,6 +1,6 @@
-import cv2
 from typing import Optional
 
+import cv2
 from PIL import Image, ImageDraw
 
 from pt750 import draw, models
@@ -45,9 +45,7 @@ class TextLabel(Label):
         self.generate()
 
     def generate(self):
-        img = draw.horiz_text_block(
-            self.height, self.fontname, self.size, self.lines, alignment=self.align
-        )
+        img = draw.horiz_text_block(self.height, self.fontname, self.size, self.lines, alignment=self.align)
         self.img = img
 
 
@@ -80,9 +78,7 @@ class QRLabel(Label):
     def generate(self):
         qr_img = draw.qr_code(self.height, self.qrtext)
         if self.lines and all(x for x in self.lines):
-            text_img = draw.horiz_text_block(
-                self.height, self.fontname, self.size, self.lines, self.align
-            )
+            text_img = draw.horiz_text_block(self.height, self.fontname, self.size, self.lines, self.align)
             width = qr_img.width + text_img.width + self.padding
             img = Image.new(mode="1", size=(width, self.height), color=1)
             img.paste(qr_img)
@@ -130,9 +126,7 @@ class ArucoLabel(Label):
         aruco_img = Image.fromarray(color_coverted)
 
         if self.lines and all(x for x in self.lines):
-            text_img = draw.horiz_text_block(
-                self.height, self.fontname, self.size, self.lines, self.align
-            )
+            text_img = draw.horiz_text_block(self.height, self.fontname, self.size, self.lines, self.align)
             width = aruco_img.width + text_img.width + self.padding
             img = Image.new(mode="1", size=(width, self.height), color=1)
             img.paste(aruco_img)
@@ -188,9 +182,7 @@ class FlagLabel(Label):
         self.generate()
 
     def generate(self):
-        text_img = draw.horiz_text_block(
-            self.height, self.fontname, self.size, lines=[self.label]
-        )
+        text_img = draw.horiz_text_block(self.height, self.fontname, self.size, lines=[self.label])
 
         width = (text_img.width * 2) + self.padding
         img = Image.new(mode="1", size=(width, self.height), color=1)
