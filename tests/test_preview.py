@@ -39,7 +39,7 @@ def a_random_string(min_len=None, max_len=None, nullable=False):
     return "".join(random.choice(string.ascii_letters) for _ in range(str_len))
 
 
-def a_random_model(model, **kwargs):
+def a_random_model(model, **kwargs):  # noqa: C901
     faker = JSF(model.model_json_schema())
     proposed = faker.generate()
 
@@ -65,6 +65,16 @@ def a_random_model(model, **kwargs):
     if "qrtext" in proposed and not proposed["qrtext"]:
         proposed["qrtext"] = a_random_string()
 
+    if "dictionary" in proposed:
+        proposed["dictionary"] = random.choice(
+            [
+                "DICT_4X4_50",
+                "DICT_4X4_100",
+            ]
+        )
+    if "id" in proposed:
+        proposed["id"] = random.randint(0, 49)
+
     for k, v in kwargs.items():
         if v is not None:
             proposed[k] = v
@@ -79,6 +89,7 @@ label_types = [
     (models.QRLabelRequest,),
     (models.WrapLabelRequest,),
     (models.FlagLabelRequest,),
+    (models.ArucoLabelRequest,),
 ]
 
 tape_types = [(x, y.printable_height) for x, y in models.tapes.items()]

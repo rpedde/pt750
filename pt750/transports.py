@@ -7,7 +7,7 @@ import requests
 from easysnmp import Session
 from PIL import Image
 
-from pt750.models import PrinterStatus, tapes
+from pt750.models import PrinterStatus, Tapes, tapes
 
 
 class LabelPrinter:
@@ -23,7 +23,7 @@ class LabelPrinter:
         else:
             raise RuntimeError("cannot find transport")
 
-    def print(self, img: Image):
+    def print(self, img: Image.Image):
         raise NotImplementedError
 
     def status(self):
@@ -31,7 +31,7 @@ class LabelPrinter:
 
 
 class PT750W(LabelPrinter):
-    def print(self, img: Image):
+    def print(self, img: Image.Image):
         img = img.transpose(Image.Transpose.ROTATE_90)
         img = img.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 
@@ -64,7 +64,7 @@ class PT750W(LabelPrinter):
 
         self.transport.send_bytes(bytes)
 
-    def status(self) -> PrinterStatus:
+    def status(self) -> PrinterStatus | None:
         return self.transport.get_status()
 
 
@@ -75,7 +75,7 @@ class Transport:
     def send_bytes(self, bytes: bytes):
         raise NotImplementedError
 
-    def get_status(self) -> PrinterStatus:
+    def get_status(self) -> PrinterStatus | None:
         raise NotImplementedError
 
 
@@ -90,7 +90,7 @@ class USBTransport(Transport):
         with open(self.path, "wb") as f:
             f.write(bytes)
 
-    def get_status(self) -> PrinterStatus:
+    def get_status(self) -> PrinterStatus | None:
         max_attempts = 3
 
         while max_attempts:
@@ -110,7 +110,7 @@ class USBTransport(Transport):
         media = None
         media_mm = int(raw_status[10])
         if media_mm:
-            media = f"{media_mm}mm"
+            media = Tapes(f"{media_mm}mm")
 
         # we need media and ready status
         return PrinterStatus(media=media, ready=True)
@@ -127,9 +127,12 @@ class TCPTransport(Transport):
         self.host = parts.hostname
         self.port = parts.port if parts.port else 9100
 
-        # I don't believe this is configurable for the printer... I believe it's
-        # just plain always on with v2c/public read-only
-        self.snmp = Session(hostname=self.host, community="public", version=2)
+        if not self.host:
+            self.snmp = None
+        else:
+            # I don't believe this is configurable for the printer... I believe it's
+            # just plain always on with v2c/public read-only
+            self.snmp = Session(hostname=self.host, community="public", version=2)
 
     def send_bytes(self, bytes):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -137,7 +140,10 @@ class TCPTransport(Transport):
         s.sendall(bytes)
         s.close()
 
-    def get_status(self) -> PrinterStatus:
+    def get_status(self) -> PrinterStatus | None:
+        if not self.snmp:
+            return None
+
         media_descriptor = self.snmp.get(self.MEDIA_OID)
         status = self.snmp.get(self.STATUS_OID)
 
@@ -146,7 +152,7 @@ class TCPTransport(Transport):
         media = None
         for tape in tapes:
             if media_descriptor.value.startswith(tape):
-                media = tape
+                media = Tapes(tape)
 
         return PrinterStatus(media=media, ready=ready)
 
@@ -160,16 +166,16 @@ class HTTPTransport(Transport):
         parts = parts._replace(path=parts.path.rsplit("/", 1)[0])
         self.base_uri = urlunparse(parts)
 
-    def get_status(self) -> PrinterStatus:
+    def get_status(self) -> PrinterStatus | None:
         rv = requests.get(f"{self.base_uri}/status")
         if not rv.ok:
             logging.error(f"Error getting status for {self.printer}: {rv.status_code}")
-            return PrinterStatus(media="24mm", ready=False)
+            return PrinterStatus(media=Tapes("24mm"), ready=False)
 
         body = rv.json()
         if self.printer not in body:
             logging.error(f"Remote does not have printer {self.printer}")
-            return PrinterStatus(media="24mm", ready=False)
+            return PrinterStatus(media=Tapes("24mm"), ready=False)
 
         return PrinterStatus(**body[self.printer])
 
