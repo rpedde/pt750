@@ -1,0 +1,9 @@
+services:
+  pt750:
+    container_name: pt750
+    image: ghcr.io/rpedde/pt750:master
+    environment:
+      - L_PRINTERS=default=tcp://192.168.1.10:9100
+    ports:
+      - 5000:5000
+    restart: always
